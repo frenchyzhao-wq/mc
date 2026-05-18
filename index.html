@@ -6,37 +6,82 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Calculator</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { margin: 0; background-color: #000; font-family: -apple-system, BlinkMacSystemFont, sans-serif; display: flex; justify-content: center; align-items: flex-end; height: 100vh; overflow: hidden; user-select: none; }
+        .calculator { width: 100vw; max-width: 414px; padding-bottom: 30px; }
+        .display { color: #fff; font-size: 80px; font-weight: 300; text-align: right; padding: 0 30px; margin-bottom: 15px; white-space: nowrap; overflow: hidden; }
+        .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 15px; }
+        .btn { background-color: #333; color: #fff; font-size: 35px; border: none; border-radius: 50%; aspect-ratio: 1; cursor: pointer; }
+        .btn.gray { background-color: #a5a5a5; color: #000; }
+        .btn.orange { background-color: #ff9f0a; color: #fff; }
+        .btn.zero { grid-column: span 2; border-radius: 40px; aspect-ratio: auto; padding-left: 30px; text-align: left; }
+    </style>
 </head>
 <body>
     <div class="calculator">
         <div id="display" class="display">0</div>
         <div class="buttons">
             <button class="btn gray" onclick="pressKey('AC')">AC</button>
-            <button class="btn gray">±</button>
-            <button class="btn gray">%</button>
+            <button class="btn gray" onclick="pressKey('±')">±</button>
+            <button class="btn gray" onclick="pressKey('%')">%</button>
             <button class="btn orange" onclick="pressKey('×')">×</button>
-            
             <button class="btn" onclick="pressKey('7')">7</button>
             <button class="btn" onclick="pressKey('8')">8</button>
             <button class="btn" onclick="pressKey('9')">9</button>
             <button class="btn orange" onclick="pressKey('×')">×</button>
-            
             <button class="btn" onclick="pressKey('4')">4</button>
             <button class="btn" onclick="pressKey('5')">5</button>
             <button class="btn" onclick="pressKey('6')">6</button>
             <button class="btn orange" onclick="pressKey('-')">-</button>
-            
             <button class="btn" onclick="pressKey('1')">1</button>
             <button class="btn" onclick="pressKey('2')">2</button>
             <button class="btn" onclick="pressKey('3')">3</button>
             <button class="btn orange" onclick="pressKey('+')">+</button>
-            
             <button class="btn zero" onclick="pressKey('0')">0</button>
             <button class="btn" onclick="pressKey('.')">.</button>
             <button class="btn orange" onclick="pressKey('=')">=</button>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        let numbersEntered = [];
+        let currentInput = "";
+
+        function pressKey(key) {
+            const screen = document.getElementById("display");
+            if (key === 'AC') {
+                numbersEntered = [];
+                currentInput = "";
+                screen.innerText = "0";
+                return;
+            }
+            if (!isNaN(key) || key === '.') {
+                if (key === '.' && currentInput.includes('.')) return;
+                currentInput += key;
+                screen.innerText = currentInput;
+                return; 
+            }
+            if (key === '×') {
+                if (currentInput !== "") {
+                    numbersEntered.push(currentInput);
+                    currentInput = ""; 
+                }
+                return;
+            }
+            if (key === '=') {
+                if (currentInput !== "") {
+                    numbersEntered.push(currentInput);
+                }
+                if (numbersEntered.length === 3 && numbersEntered.every(num => num.length === 4)) {
+                    const now = new Date();
+                    const liveTimestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+                    screen.innerText = Number(liveTimestamp).toLocaleString();
+                } else {
+                    screen.innerText = "Error"; 
+                }
+                numbersEntered = [];
+                currentInput = "";
+            }
+        }
+    </script>
 </body>
 </html>
