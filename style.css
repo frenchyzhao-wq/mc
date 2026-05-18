@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="calculator">
+        <div id="display" class="display">0</div>
+        <div class="buttons">
+            <button class="btn gray" onclick="pressKey('AC')">AC</button>
+            <button class="btn gray">±</button>
+            <button class="btn gray">%</button>
+            <button class="btn orange" onclick="pressKey('×')">×</button>
+            
+            <button class="btn" onclick="pressKey('7')">7</button>
+            <button class="btn" onclick="pressKey('8')">8</button>
+            <button class="btn" onclick="pressKey('9')">9</button>
+            <button class="btn orange" onclick="pressKey('×')">×</button>
+            
+            <button class="btn" onclick="pressKey('4')">4</button>
+            <button class="btn" onclick="pressKey('5')">5</button>
+            <button class="btn" onclick="pressKey('6')">6</button>
+            <button class="btn orange" onclick="pressKey('-')">-</button>
+            
+            <button class="btn" onclick="pressKey('1')">1</button>
+            <button class="btn" onclick="pressKey('2')">2</button>
+            <button class="btn" onclick="pressKey('3')">3</button>
+            <button class="btn orange" onclick="pressKey('+')">+</button>
+            
+            <button class="btn zero" onclick="pressKey('0')">0</button>
+            <button class="btn" onclick="pressKey('.')">.</button>
+            <button class="btn orange" onclick="pressKey('=')">=</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
