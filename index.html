@@ -11,7 +11,7 @@
         .calculator { width: 100vw; max-width: 414px; padding-bottom: 30px; }
         .display { color: #fff; font-size: 80px; font-weight: 300; text-align: right; padding: 0 30px; margin-bottom: 15px; white-space: nowrap; overflow: hidden; }
         .buttons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 0 15px; }
-        .btn { background-color: #333; color: #fff; font-size: 35px; border: none; border-radius: 50%; aspect-ratio: 1; cursor: pointer; }
+        .btn { background-color: #333; color: #fff; font-size: 35px; border: none; border-radius: 50%; aspect-ratio: 1; cursor: pointer; outline: none; }
         .btn.gray { background-color: #a5a5a5; color: #000; }
         .btn.orange { background-color: #ff9f0a; color: #fff; }
         .btn.zero { grid-column: span 2; border-radius: 40px; aspect-ratio: auto; padding-left: 30px; text-align: left; }
@@ -24,61 +24,104 @@
             <button class="btn gray" onclick="pressKey('AC')">AC</button>
             <button class="btn gray" onclick="pressKey('±')">±</button>
             <button class="btn gray" onclick="pressKey('%')">%</button>
-            <button class="btn orange" onclick="pressKey('×')">×</button>
+            <button class="btn orange" onclick="pressKey('/')">÷</button>
+            
             <button class="btn" onclick="pressKey('7')">7</button>
             <button class="btn" onclick="pressKey('8')">8</button>
             <button class="btn" onclick="pressKey('9')">9</button>
-            <button class="btn orange" onclick="pressKey('×')">×</button>
+            <button class="btn orange" onclick="pressKey('*')">×</button>
+            
             <button class="btn" onclick="pressKey('4')">4</button>
             <button class="btn" onclick="pressKey('5')">5</button>
             <button class="btn" onclick="pressKey('6')">6</button>
             <button class="btn orange" onclick="pressKey('-')">-</button>
+            
             <button class="btn" onclick="pressKey('1')">1</button>
             <button class="btn" onclick="pressKey('2')">2</button>
             <button class="btn" onclick="pressKey('3')">3</button>
             <button class="btn orange" onclick="pressKey('+')">+</button>
+            
             <button class="btn zero" onclick="pressKey('0')">0</button>
             <button class="btn" onclick="pressKey('.')">.</button>
             <button class="btn orange" onclick="pressKey('=')">=</button>
         </div>
     </div>
+
     <script>
-        let numbersEntered = [];
+        let magicTracker = [];
         let currentInput = "";
+        let globalEquation = "";
 
         function pressKey(key) {
             const screen = document.getElementById("display");
+
             if (key === 'AC') {
-                numbersEntered = [];
+                magicTracker = [];
                 currentInput = "";
+                globalEquation = "";
                 screen.innerText = "0";
                 return;
             }
+
+            // Track standard number inputs
             if (!isNaN(key) || key === '.') {
                 if (key === '.' && currentInput.includes('.')) return;
                 currentInput += key;
+                globalEquation += key;
                 screen.innerText = currentInput;
-                return; 
-            }
-            if (key === '×') {
-                if (currentInput !== "") {
-                    numbersEntered.push(currentInput);
-                    currentInput = ""; 
-                }
                 return;
             }
+
+            // Track operators (+, -, *, /)
+            if (['+', '-', '*', '/'].includes(key)) {
+                if (currentInput !== "") {
+                    magicTracker.push({ val: currentInput, op: key });
+                    currentInput = "";
+                }
+                globalEquation += key;
+                return;
+            }
+
+            // Calculate output when Equals is pressed
             if (key === '=') {
                 if (currentInput !== "") {
-                    numbersEntered.push(currentInput);
+                    magicTracker.push({ val: currentInput, op: '=' });
                 }
-                if (numbersEntered.length === 3 && numbersEntered.every(num => num.length === 4)) {
+
+                // MAGIC TRIGGER CHECK:
+                // 1. Must have exactly 3 entries tracked
+                // 2. All 3 entries must be exactly 4 digits long
+                // 3. The operations used must both be multiplication (*)
+                if (magicTracker.length === 3 && 
+                    magicTracker.every(item => item.val.length === 4) && 
+                    magicTracker[0].op === '*' && magicTracker[1].op === '*') {
+                    
                     const now = new Date();
-                    const liveTimestamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+                    const year = now.getFullYear();
+                    const month = String(now.getMonth() + 1).padStart(2, '0');
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+
+                    // e.g., 202605181523
+                    const liveTimestamp = `${year}${month}${day}${hours}${minutes}`;
                     screen.innerText = Number(liveTimestamp).toLocaleString();
                 } else {
-                    screen.innerText = "Error"; 
+                    // STANDARD MATH FALLBACK: Solve the formula perfectly like a real calculator
+                    try {
+                        if (globalEquation !== "") {
+                            let result = eval(globalEquation);
+                            screen.innerText = Number(result).toLocaleString();
+                            globalEquation = result.toString(); // Allow chain operations
+                        }
+                    } catch (err) {
+                        screen.innerText = "Error";
+                        globalEquation = "";
+                    }
                 }
-                numbersEntered = [];
+
+                // Reset step tracking for the next run
+                magicTracker = [];
                 currentInput = "";
             }
         }
